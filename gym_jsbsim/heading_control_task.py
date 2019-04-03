@@ -161,7 +161,7 @@ class HeadingControlTask(BaseFlightTask):
             prp_half_range = (action_prp.max - action_prp.min) / 2
             prp_middle = (action_prp.max + action_prp.min) / 2
             action_diff_abs = math.fabs(a - prp_middle) # \in [0, prp_half_range]
-            prod *= 1 - (action_diff_abs / prp_half_range)**32
+            act_r *= 1 - (action_diff_abs / prp_half_range)**32
         act_r = max(act_r, 0)
         return (heading_r + alt_r)/2.0 * roll_r * acc_r * act_r
 
