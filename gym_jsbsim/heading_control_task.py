@@ -153,7 +153,17 @@ class HeadingControlTask(BaseFlightTask):
         acc_r -= math.sqrt(non_vertical_accel)
         roll_r = max(roll_r, 0)
         acc_r = max(acc_r, 0)
-        return (heading_r + alt_r)/2.0 * roll_r * acc_r
+        # This function should be close to 1 when actions are not 1,
+        # and should be 0 when actions are 1. This is achieved with the high exponent.
+        # Assuming all actions are bounded.
+        act_r = 1
+        for prp, a in zip(self.action_variables, action):
+            prp_half_range = (prp.max - prp.min) / 2
+            prp_middle = (prp.max + prp.min) / 2
+            action_diff_abs = math.fabs(a - prp_middle) # \in [0, prp_half_range]
+            prod *= 1 - (action_diff_abs / prp_half_range)**32
+        act_r = max(act_r, 0)
+        return (heading_r + alt_r)/2.0 * roll_r * acc_r * act_r
 
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get   
