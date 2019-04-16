@@ -92,12 +92,18 @@ class BaseFlightTask(ABC):
         action = self.Action(*(sim[prop] for prop in self.action_variables))
         done = self._is_terminal(sim, state)
         reward = self._get_reward(sim, self.last_state, action, state)
-        if self.debug:
-            self._validate_state(state, done, action, reward)
+
+        # ensure no nans come out of the simulation
+        is_valid = self._validate_state(state, done, action, reward)
+        if not is_valid:
+            done = True
+            reward = 0
+            state = self.last_state
+
         self.last_state = state
         info = {'reward': reward}
 
-        
+
         return state, reward, done, info
 
     def observe_first_state(self, sim: Simulation) -> np.ndarray:
@@ -112,7 +118,7 @@ class BaseFlightTask(ABC):
         state = self.State(*(sim[prop] for prop in self.state_variables))
         self.last_state = state
         return state
-    
+
     def _new_episode_init(self, sim: Simulation) -> None:
         """
         This method is called at the start of every episode. It is used to set
@@ -151,14 +157,20 @@ class BaseFlightTask(ABC):
         self.Action = namedtuple('Action', legal_attribute_names)
 
     def _validate_state(self, state, done, action, reward):
-        if any(math.isnan(el) for el in state):  # float('nan') in state doesn't work!
-            msg = (f'Invalid state encountered!\n'
-                   f'State: {state}\n'
-                   f'Prev. State: {self.last_state}\n'
-                   f'Action: {action}\n'
-                   f'Terminal: {done}\n'
-                   f'Reward: {reward}')
-            warnings.warn(msg, RuntimeWarning)
+        if (any(math.isnan(el) for el in state) or
+            math.isnan(reward)
+        ):  # float('nan') in state doesn't work!
+            if self.debug:
+                msg = (f'Invalid state encountered!\n'
+                       f'State: {state}\n'
+                       f'Prev. State: {self.last_state}\n'
+                       f'Action: {action}\n'
+                       f'Terminal: {done}\n'
+                       f'Reward: {reward}')
+                warnings.warn(msg, RuntimeWarning)
+            return False
+        else:
+            return True
 
     def _update_custom_properties(self, sim: Simulation) -> None:
         """ Calculates any custom properties which change every timestep. """
