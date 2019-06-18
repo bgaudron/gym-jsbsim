@@ -1,11 +1,25 @@
 #!/bin/bash
-set -ex
-apt-get update && apt-get install -y patchelf cmake > /dev/null
+#set -ex
+#apt-get update && apt-get install -y patchelf cmake > /dev/null
 
 cd $(dirname "$0")
-. ./exports.sh
+echo $PWD
 
-./install_jsbsim.sh
-./jsbsim_compile_and_graft.sh
+python setup.py sdist bdist_wheel
 
-pip wheel --no-deps -w /io/wheelhouse .
+#pip wheel --no-deps -w /io/wheelhouse .
+
+#if [ $(uname) == 'Darwin' ]; then
+    #for lib in $(find $JSBSIM_PATH/lib -name "*.dylib"); do
+        #install_name_tool -id $lib $lib
+        ##for dep in $(otool -L $lib | grep "@rpath" | awk '{print $1}'); do
+            #install_name_tool -change $dep "$JSBSIM_PATH/lib/${dep##@rpath/}" $lib
+        #done
+    #done
+#fi
+#
+#if [ $(uname) == 'Linux' ]; then
+    #for lib in $(find $JSBSIM_PATH/lib -name "*.so.2.87"); do
+        #patchelf --set-rpath $JSBSIM_PATH/lib $lib
+    #done
+#fi

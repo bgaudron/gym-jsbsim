@@ -1,10 +1,5 @@
 #!/bin/bash
 set -ex
 
-if [ $(uname) == 'Linux' ]; then
-    docker run -v $PWD:/io python:${MB_PYTHON_VERSION} /io/docker_build_wheel.sh
-fi
-
-if [ $(uname) == 'Darwin' ]; then
-    ./osx_build_wheel.sh
-fi
+rm -rf build dist gym_jsbsim.egg-info
+docker run -v $PWD:/io gualleon583a/python:3 /io/docker_build_wheel.sh

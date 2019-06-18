@@ -43,6 +43,7 @@ class Build(build_ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
+                      '-DBUILD_SHARED_LIBS=ON',
                       '-DCYTHON_EXECUTABLE=' + os.path.join(os.path.abspath(os.path.dirname(sys.executable)) + os.sep + 'cython'),
                       '-DBUILD_PYTHON_MODULE=ON']
 
@@ -56,7 +57,7 @@ class Build(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', '-j4']
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
@@ -66,7 +67,7 @@ class Build(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-need_files = ['cpp_household.so']
+need_files = ['.so']
 hh = setup_py_dir + "/jsbsim"
 need_files_ext = 'png jpg urdf obj mtl dae off stl STL xml glsl dylib'.split()
 need_files_re = [re.compile(r'.+\.'+p) for p in need_files_ext]
@@ -91,7 +92,7 @@ setup(
     maintainer_email = 'john.doe@gmail.com',
     url = 'https://github.com/galleon/gym-jsbsim',
     packages=[x for x in find_packages()],
-    ext_modules=[CMakeExtension(name='jsbsim/jsbsim', sourcedir='jsbsim')],
+    ext_modules=[CMakeExtension(name='jsbsim', sourcedir='jsbsim')],
     cmdclass={'build_ext': Build},
     install_requires=['gym'],
     package_data = { '': need_files }
