@@ -1,9 +1,11 @@
 #!/bin/bash
 #set -ex
-#apt-get update && apt-get install -y patchelf cmake > /dev/null
 
 cd $(dirname "$0")
 echo $PWD
+
+cmake --version
+more /etc/issue
 
 python setup.py sdist bdist_wheel
 

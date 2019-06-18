@@ -43,8 +43,8 @@ class Build(build_ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DBUILD_SHARED_LIBS=ON',
                       '-DCYTHON_EXECUTABLE=' + os.path.join(os.path.abspath(os.path.dirname(sys.executable)) + os.sep + 'cython'),
+                      '-DBUILD_SHARED_LIBS=ON',
                       '-DBUILD_PYTHON_MODULE=ON']
 
         cfg = 'Debug' if self.debug else 'Release'

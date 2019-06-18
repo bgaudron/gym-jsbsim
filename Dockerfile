@@ -1,6 +1,6 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && apt-get install -y ubuntu-server python3-dev python3-pip curl apt-utils patchelf cmake pkg-config git
+RUN apt-get update && apt-get install -y patchelf curl git python3-dev python3-pip cmake
 RUN bash -c "ln -s $(which python3) /usr/bin/python && ln -s $(which cython3) /usr/bin/cython && ln -s $(which pip3) /usr/bin/pip"
 #COPY . /code
 #RUN  cd /code && \
