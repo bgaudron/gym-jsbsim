@@ -67,7 +67,7 @@ class Build(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-need_files = ['.so']
+need_files = ['jsbsim.cpython-36m-x86_64-linux-gnu.so']
 hh = setup_py_dir + "/jsbsim"
 need_files_ext = 'png jpg urdf obj mtl dae off stl STL xml glsl dylib'.split()
 need_files_re = [re.compile(r'.+\.'+p) for p in need_files_ext]

@@ -6,6 +6,8 @@ echo $PWD
 
 cmake --version
 more /etc/issue
+which cython
+which python
 
 python setup.py sdist bdist_wheel
 
