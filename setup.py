@@ -94,6 +94,8 @@ setup(
     packages=[x for x in find_packages()],
     ext_modules=[CMakeExtension(name='jsbsim', sourcedir='jsbsim')],
     cmdclass={'build_ext': Build},
-    install_requires=['gym'],
+    install_requires=['gym>=0.12.5'],
+    data_files=[('aircraft', ['jsbsim/aircraft/aircraft_template.xml']),
+                ('aircraft/A320', ['jsbsim/aircraft/A320/A320.xml'])],
     package_data = { '': need_files }
 )

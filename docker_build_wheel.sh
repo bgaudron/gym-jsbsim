@@ -4,11 +4,6 @@
 cd $(dirname "$0")
 echo $PWD
 
-cmake --version
-more /etc/issue
-which cython
-which python
-
 python setup.py sdist bdist_wheel
 
 #pip wheel --no-deps -w /io/wheelhouse .
