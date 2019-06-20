@@ -3,7 +3,7 @@ import gym_jsbsim
 
 
 def random_agent(episodes=100):
-	env = gym.make("GymJsbsim-HeadingControlTask-{aircraft_name}-v0")
+	env = gym.make("GymJsbsim-HeadingControlTask-a320-v0")
 	env.reset()
 	env.render()
 	for e in range(episodes):

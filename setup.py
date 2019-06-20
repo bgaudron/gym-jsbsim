@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from setuptools import setup, Extension
+from setuptools import Extension
 from setuptools.command.build_ext import build_ext
 import platform
 import subprocess
@@ -67,19 +67,18 @@ class Build(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-need_files = ['jsbsim.cpython-36m-x86_64-linux-gnu.so']
-hh = setup_py_dir + "/jsbsim"
-need_files_ext = 'png jpg urdf obj mtl dae off stl STL xml glsl dylib'.split()
+need_files = []
+hh = setup_py_dir + os.sep + "jsbsim" + os.sep + "systems"
+need_files_ext = 'png jpg xml dylib'.split()
 need_files_re = [re.compile(r'.+\.'+p) for p in need_files_ext]
 need_files_re.append(re.compile(r'.+\.so(.\d+)*'))
 need_files_re.append(re.compile(r'.+/\.libs/.+'))
-need_files_re.append(re.compile(r'.+/\.qt_plugins/.+'))
 
 for root, dirs, files in os.walk(hh):
     for fn in files:
-        fn = root + '/' + fn
+        fn = root + os.sep + fn
         if any([p.match(fn) for p in need_files_re]):
-            need_files.append(fn[1+len(hh):])
+            need_files.append('jsbsim' + os.sep + 'systems' + os.sep + fn[1+len(hh):])
 
 print("found resource files: %i" % len(need_files))
 for n in need_files: print("-- %s" % n)
@@ -96,6 +95,9 @@ setup(
     cmdclass={'build_ext': Build},
     install_requires=['gym>=0.12.5'],
     data_files=[('aircraft', ['jsbsim/aircraft/aircraft_template.xml']),
-                ('aircraft/A320', ['jsbsim/aircraft/A320/A320.xml'])],
-    package_data = { '': need_files }
+                ('aircraft/A320', ['jsbsim/aircraft/A320/A320.xml']),
+                ('engine', ['jsbsim/engine/CFM56_5.xml', 'jsbsim/engine/direct.xml']),
+                ('systems', need_files)],
+    # key is the package name
+    package_data = { 'gym_jsbsim': need_files }
 )
