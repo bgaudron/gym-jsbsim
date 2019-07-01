@@ -41,7 +41,7 @@ class CustomBuild(build_ext):
             self.build_extension(ext)
 
     def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        extdir = os.path.abspath(os.path.join(os.path.dirname(self.get_ext_fullpath(ext.name)), 'gym_jsbsim'))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCYTHON_EXECUTABLE=' + os.path.join(os.path.abspath(os.path.dirname(sys.executable)) + os.sep + 'cython'),
@@ -71,7 +71,6 @@ class CustomBuild(build_ext):
         self.module_name = self.get_ext_filename(self.extensions[0].name)
         self.copy_file(os.path.join(self.build_temp, 'tests', self.module_name),
                        os.path.join(extdir, self.module_name))
-
 
 class CustomInstall(install):
     def run(self):
@@ -104,13 +103,8 @@ setup(
     url = 'https://github.com/galleon/gym-jsbsim',
     packages=[x for x in find_packages()],
     ext_modules=[CMakeExtension(name='jsbsim', sourcedir='jsbsim')],
-#   cmdclass={'build_ext': CustomBuild, 'install': CustomInstall},
     cmdclass={'build_ext': CustomBuild},
     install_requires=['gym>=0.12.5'],
-#   data_files=[('aircraft', ['jsbsim/aircraft/aircraft_template.xml']),
-#               ('aircraft/A320', ['jsbsim/aircraft/A320/A320.xml']),
-#               ('engine', ['jsbsim/engine/CFM56_5.xml', 'jsbsim/engine/direct.xml']),
-#               ('systems', need_files)],
     # key is the package name
     package_data = { 'gym_jsbsim': ['data/aircraft/A320/*.xml', 'data/engine/*.xml', 'data/systems/*.xml'] }
 )
