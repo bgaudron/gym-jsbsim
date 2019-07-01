@@ -1,8 +1,9 @@
 from collections import namedtuple
+import os
+import sys
 import jsbsim
 import gym_jsbsim.simulation_parameters as param
 from gym_jsbsim.properties import custom_properties, throttle_cmd, mixture_cmd
-
 
 class Simulation:
     """
@@ -13,7 +14,6 @@ class Simulation:
 
     def __init__(self, aircraft_name="A320", init_conditions=None):
         """
-
         Constructor. Creates an instance of JSBSim and sets initial conditions.
 
 
@@ -24,24 +24,24 @@ class Simulation:
         :param init_conditions: dict mapping properties to their initial values.
 
             Defaults to None, causing a default set of initial props to be used.
-
         """
+
         self.jsbsim_exec = jsbsim.FGFDMExec()
         self.jsbsim_exec.set_debug_level(0)  # requests JSBSim not to output any messages whatsoever
         self.aircraft_name = aircraft_name
 
-        # set paths
-        self.jsbsim_exec.set_root_dir(param.ROOT_DIR)
-        self.jsbsim_exec.set_aircraft_path(param.AIRCRAFT_PATH)
-        self.jsbsim_exec.set_engine_path(param.ENGINE_PATH)
-        self.jsbsim_exec.set_systems_path(param.SYSTEM_PATH)
+        data_path = os.path.dirname(sys.modules['gym_jsbsim'].__file__) + os.sep + 'data'
+
+        self.jsbsim_exec.set_root_dir(data_path)
+        self.jsbsim_exec.set_aircraft_path(data_path + os.sep + "aircraft")
+        self.jsbsim_exec.set_engine_path(data_path + os.sep + "engine")
+        self.jsbsim_exec.set_systems_path(data_path + os.sep + "systems")
 
         # set jsbsim integration time step
         dt = 1 / param.JSBSIM_FREQ
         self.jsbsim_exec.set_dt(dt)
 
         self.initialise(init_conditions)
-
 
 
     def initialise(self, init_conditions=None):

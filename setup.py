@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
+from setuptools.command.install import install
 import platform
 import subprocess
 import sys, os
@@ -23,7 +24,7 @@ class CMakeExtension(Extension):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
 
-class Build(build_ext):
+class CustomBuild(build_ext):
     def run(self):
         try:
             out = subprocess.check_output(['cmake', '--version'])
@@ -67,6 +68,17 @@ class Build(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+        self.module_name = self.get_ext_filename(self.extensions[0].name)
+        self.copy_file(os.path.join(self.build_temp, 'tests', self.module_name),
+                       os.path.join(extdir, self.module_name))
+
+
+class CustomInstall(install):
+    def run(self):
+        print(self.install_dir)
+        print(os.path.get_cwd())
+        setuptools.command.install.install.run(self)
+
 need_files = []
 hh = setup_py_dir + os.sep + "jsbsim" + os.sep + "systems"
 need_files_ext = 'png jpg xml dylib'.split()
@@ -92,12 +104,13 @@ setup(
     url = 'https://github.com/galleon/gym-jsbsim',
     packages=[x for x in find_packages()],
     ext_modules=[CMakeExtension(name='jsbsim', sourcedir='jsbsim')],
-    cmdclass={'build_ext': Build},
+#   cmdclass={'build_ext': CustomBuild, 'install': CustomInstall},
+    cmdclass={'build_ext': CustomBuild},
     install_requires=['gym>=0.12.5'],
-    data_files=[('aircraft', ['jsbsim/aircraft/aircraft_template.xml']),
-                ('aircraft/A320', ['jsbsim/aircraft/A320/A320.xml']),
-                ('engine', ['jsbsim/engine/CFM56_5.xml', 'jsbsim/engine/direct.xml']),
-                ('systems', need_files)],
+#   data_files=[('aircraft', ['jsbsim/aircraft/aircraft_template.xml']),
+#               ('aircraft/A320', ['jsbsim/aircraft/A320/A320.xml']),
+#               ('engine', ['jsbsim/engine/CFM56_5.xml', 'jsbsim/engine/direct.xml']),
+#               ('systems', need_files)],
     # key is the package name
-    package_data = { 'gym_jsbsim': need_files }
+    package_data = { 'gym_jsbsim': ['data/aircraft/A320/*.xml', 'data/engine/*.xml', 'data/systems/*.xml'] }
 )

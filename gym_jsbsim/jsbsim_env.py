@@ -21,23 +21,20 @@ class JSBSimEnv(gym.Env):
     metadata = {'render.modes': ['human', 'csv']}
 
 
-    def __init__(self, task, aircraft_name):
+#   def __init__(self, task, aircraft_name):
+    def __init__(self, task):
         """
-
         Constructor. Init some internal state, but JSBSimEnv.reset() must be
 
         called first before interacting with environment.
 
-
-
         :param task the Task for the task agent is to perform
 
         :param aircraft_name: the name of the JSBSim aircraft to be used.
-
         """
 
         self.sim = None
-        self.aircraft_name = aircraft_name
+        #self.aircraft_name = aircraft_name
         self.task = task
 
         # set Space objects
@@ -47,9 +44,19 @@ class JSBSimEnv(gym.Env):
         self.state = None
 
 
+    def configure(self, aircraft_name):
+        """
+        Constructor. Init some internal state, but JSBSimEnv.reset() must be
+
+        called first before interacting with environment.
+
+        :param aircraft_name the name of the aircraft to be used
+        """
+        self.aircraft_name = aircraft_name
+
+
     def step(self, action=None):
         """
-
         Run one timestep of the environment's dynamics. When end of
 
         episode is reached, you are responsible for calling `reset()`
@@ -57,8 +64,6 @@ class JSBSimEnv(gym.Env):
         to reset this environment's state.
 
         Accepts an action and returns a tuple (observation, reward, done, info).
-
-
 
         :param action: np.array, the agent's action, with same length as action variables.
 
@@ -71,7 +76,6 @@ class JSBSimEnv(gym.Env):
             done: whether the episode has ended, in which case further step() calls are undefined
 
             info: auxiliary information
-
         """
 
         if action is not None:

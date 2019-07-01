@@ -1,5 +1,6 @@
-from gym_jsbsim.properties as prp
+from gym_jsbsim.properties import *
 from gym_jsbsim.task import Task
+import random
 
 """
     A task in which the agent must perform steady, level flight maintaining its initial heading.
