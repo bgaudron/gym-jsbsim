@@ -72,27 +72,11 @@ class CustomBuild(build_ext):
         self.copy_file(os.path.join(self.build_temp, 'tests', self.module_name),
                        os.path.join(extdir, self.module_name))
 
-class CustomInstall(install):
-    def run(self):
-        print(self.install_dir)
-        print(os.path.get_cwd())
-        setuptools.command.install.install.run(self)
-
-need_files = []
-hh = setup_py_dir + os.sep + "jsbsim" + os.sep + "systems"
-need_files_ext = 'png jpg xml dylib'.split()
-need_files_re = [re.compile(r'.+\.'+p) for p in need_files_ext]
-need_files_re.append(re.compile(r'.+\.so(.\d+)*'))
-need_files_re.append(re.compile(r'.+/\.libs/.+'))
-
-for root, dirs, files in os.walk(hh):
-    for fn in files:
-        fn = root + os.sep + fn
-        if any([p.match(fn) for p in need_files_re]):
-            need_files.append('jsbsim' + os.sep + 'systems' + os.sep + fn[1+len(hh):])
-
-print("found resource files: %i" % len(need_files))
-for n in need_files: print("-- %s" % n)
+#class CustomInstall(install):
+#    def run(self):
+#        print(self.install_dir)
+#        print(os.path.get_cwd())
+#        setuptools.command.install.install.run(self)
 
 setup(
     name = 'gym-jsbsim',

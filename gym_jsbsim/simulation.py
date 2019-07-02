@@ -1,7 +1,7 @@
 from collections import namedtuple
 import os
 import sys
-import jsbsim
+from gym_jsbsim import jsbsim
 import gym_jsbsim.simulation_parameters as param
 from gym_jsbsim.properties import custom_properties, throttle_cmd, mixture_cmd
 
