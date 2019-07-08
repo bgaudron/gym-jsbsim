@@ -46,6 +46,7 @@ class JsbSimEnv(gym.Env):
                              'or equal to JSBSim integration frequency of '
                              f'{self.JSBSIM_DT_HZ} Hz.')
         self.sim: Simulation = None
+        self.dt = 1 / agent_interaction_freq
         self.sim_steps_per_agent_step: int = self.JSBSIM_DT_HZ // agent_interaction_freq
         self.aircraft = aircraft
         self.task = task_type(agent_interaction_freq, aircraft)
@@ -56,6 +57,9 @@ class JsbSimEnv(gym.Env):
         self.figure_visualiser: FigureVisualiser = None
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
+      
+        self.action = np.zeros(self.action_space.shape)
+        self.action_dt = np.zeros(self.action_space.shape)
 
         try:
             self._NUM_THREADS = 100
@@ -77,10 +81,15 @@ class JsbSimEnv(gym.Env):
             done: whether the episode has ended, in which case further step() calls are undefined
             info: auxiliary information
         """
+        action = np.clip(action, self.action_space.low, self.action_space.high)
+        action_dtdt = (action - self.action_space.low) / (self.action_space.high - self.action_space.low)
+        action_dtdt = action_dtdt * 2 - 1 # now is in range (-1,1)
+        self.action += self.dt * self.action_dt + self.dt**2 * action_dtdt / 2
+        self.action_dt += self.dt * action_dtdt
         if not (action.shape == self.action_space.shape):
             raise ValueError('mismatch between action and action space size')
 
-        state, reward, done, info = self.task.task_step(self.sim, action, self.sim_steps_per_agent_step)
+        state, reward, done, info = self.task.task_step(self.sim, self.action, self.sim_steps_per_agent_step)
         return np.array(state), reward, done, info
 
     def reset(self):
@@ -89,6 +98,8 @@ class JsbSimEnv(gym.Env):
 
         :return: array, the initial observation of the space.
         """
+        self.action = np.zeros(self.action_space.shape)
+        self.action_dt = np.zeros(self.action_space.shape)
         init_conditions = self.task.get_initial_conditions()
         if self.sim:
             self.sim.reinitialise(init_conditions)

@@ -109,12 +109,7 @@ class HeadingControlTask(BaseFlightTask):
         terminal_step = sim[self.steps_left] <= 0
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
 
-        # acceleration termination
-        non_vertical_accel = math.sqrt(sim[prp.n_pilot_x] ** 2 + sim[prp.n_pilot_y] ** 2)
-        vertical_accel = sim[prp.n_pilot_z]
-        accel_termination = vertical_accel < -2.5 or vertical_accel > 1.0 or non_vertical_accel > 1.0
-
-        return terminal_step or math.fabs(sim[prp.delta_altitude]) >= 600 or accel_termination #or math.fabs(sim[prp.delta_heading]) >= 80
+        return terminal_step or math.fabs(sim[prp.delta_altitude]) >= 600
 
     def _get_reward_with_heading(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         '''
@@ -136,34 +131,12 @@ class HeadingControlTask(BaseFlightTask):
         '''
         Reward with delta and altitude heading directly in the input vector state.
         '''
-        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
-        heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
-        # inverse of the proportional absolute value between the initial and current altitude ... 
-        alt_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_altitude_to_target_ft)+1))
-        # decrease with the absolute value of the roll angle ... 
-        # A320 roll angle should stay within +-33deg=0.576rad
-        roll_r = 1.0 - math.sqrt((math.fabs(last_state.attitude_roll_rad) / 0.576))
-        # penalize acceleration that deviates from neutral acceleration (1g)
-        non_vertical_accel = math.sqrt(sim[prp.n_pilot_x] ** 2 + sim[prp.n_pilot_y] ** 2)
-        # decreases with the absolute value between the acceleration and the neutral acceleration (1g)
-        acc_r = 1.0
-        # stays positive in range (-2.5, 0.5) # TODO: make (-2.5, 1.0), which corresponds to operational limits
-        acc_r -= math.sqrt(math.fabs(sim[prp.n_pilot_z] + 1) / 1.5)
-        # penalize frontal and lateral acceleration
-        acc_r -= math.sqrt(non_vertical_accel)
-        roll_r = max(roll_r, 0)
-        acc_r = max(acc_r, 0)
-        # This function should be close to 1 when actions are not 1,
-        # and should be 0 when actions are 1. This is achieved with the high exponent.
-        # Assuming all actions are bounded.
-        act_r = 1
-        for action_prp, a in zip(self.action_variables, action):
-            prp_half_range = (action_prp.max - action_prp.min) / 2
-            prp_middle = (action_prp.max + action_prp.min) / 2
-            action_diff_abs = math.fabs(a - prp_middle) # \in [0, prp_half_range]
-            act_r *= 1 - (action_diff_abs / prp_half_range)**32
-        act_r = max(act_r, 0)
-        return (heading_r + alt_r)/2.0 * roll_r * acc_r * act_r
+        # Gaussian
+        heading_r = math.exp(-(last_state.position_delta_heading_to_target_deg/5)**2)
+        alt_r = math.exp(-(last_state.position_delta_altitude_to_target_ft/100)**2)
+        roll_r = math.exp(-(last_state.attitude_roll_rad/0.087)**2)
+        # Gaussian Prod
+        return (heading_r * alt_r * roll_r)
 
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get   
