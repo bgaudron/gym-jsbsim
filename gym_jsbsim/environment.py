@@ -59,7 +59,6 @@ class JsbSimEnv(gym.Env):
         self.step_delay = None
       
         self.action = np.zeros(self.action_space.shape)
-        self.action_dt = np.zeros(self.action_space.shape)
 
         try:
             self._NUM_THREADS = 100
@@ -81,13 +80,12 @@ class JsbSimEnv(gym.Env):
             done: whether the episode has ended, in which case further step() calls are undefined
             info: auxiliary information
         """
-        action = np.clip(action, self.action_space.low, self.action_space.high)
-        action_dtdt = (action - self.action_space.low) / (self.action_space.high - self.action_space.low)
-        action_dtdt = action_dtdt * 2 - 1 # now is in range (-1,1)
-        self.action += self.dt * self.action_dt + self.dt**2 * action_dtdt / 2
+        # action cannot change from one extreme to another in < 1 second
+        action_delta_max = self.dt * np.abs(self.action_space.high - self.action_space.low)
+        action_delta = np.clip(action - self.action, -action_delta_max, action_delta_max)
+        self.action = self.action + action_delta
+        # constrain action to range
         self.action = np.clip(self.action, self.action_space.low, self.action_space.high)
-        self.action_dt += self.dt * action_dtdt
-        self.action_dt = np.clip(self.action_dt, -1, 1)
         if not (action.shape == self.action_space.shape):
             raise ValueError('mismatch between action and action space size')
 
@@ -101,7 +99,6 @@ class JsbSimEnv(gym.Env):
         :return: array, the initial observation of the space.
         """
         self.action = np.zeros(self.action_space.shape)
-        self.action_dt = np.zeros(self.action_space.shape)
         init_conditions = self.task.get_initial_conditions()
         if self.sim:
             self.sim.reinitialise(init_conditions)
