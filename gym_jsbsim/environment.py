@@ -85,7 +85,9 @@ class JsbSimEnv(gym.Env):
         action_dtdt = (action - self.action_space.low) / (self.action_space.high - self.action_space.low)
         action_dtdt = action_dtdt * 2 - 1 # now is in range (-1,1)
         self.action += self.dt * self.action_dt + self.dt**2 * action_dtdt / 2
+        self.action = np.clip(self.action, self.action_space.low, self.action_space.high)
         self.action_dt += self.dt * action_dtdt
+        self.action_dt = np.clip(self.action_dt, -1, 1)
         if not (action.shape == self.action_space.shape):
             raise ValueError('mismatch between action and action space size')
 
