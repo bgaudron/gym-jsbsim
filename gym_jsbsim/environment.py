@@ -31,7 +31,7 @@ class JsbSimEnv(gym.Env):
     metadata = {'render.modes': ['human', 'flightgear']}
 
     def __init__(self, task_type: Type[BaseFlightTask], aircraft: Aircraft = cessna172P,
-                 agent_interaction_freq: int = 5):
+                 agent_interaction_freq: int = 60):
         """
         Constructor. Inits some internal state, but JsbSimEnv.reset() must be
         called first before interacting with environment.
