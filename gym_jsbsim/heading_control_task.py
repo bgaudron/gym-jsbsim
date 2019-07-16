@@ -134,9 +134,13 @@ class HeadingControlTask(BaseFlightTask):
         # Gaussian
         heading_r = math.exp(-(last_state.position_delta_heading_to_target_deg/5)**2)
         alt_r = math.exp(-(last_state.position_delta_altitude_to_target_ft/100)**2)
-        roll_r = math.exp(-(last_state.attitude_roll_rad/0.087)**2)
+        acc_delta = np.asarray([sim[prp.n_pilot_x],
+                                sim[prp.n_pilot_y],
+                                sim[prp.n_pilot_z] + 1])
+        acc_norm = np.linalg.norm(acc_delta)
+        acc_r = math.exp(-(acc_norm/0.25)**2)
         # Gaussian Prod
-        return (heading_r * alt_r * roll_r)
+        return (heading_r * alt_r * acc_r)
 
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get   
