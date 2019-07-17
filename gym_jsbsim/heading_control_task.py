@@ -1,5 +1,6 @@
 import math
 import random
+import numpy as np
 import gym_jsbsim.properties as prp
 from gym_jsbsim import utils
 from gym_jsbsim.simulation import Simulation
