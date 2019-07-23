@@ -10,7 +10,6 @@ from gym_jsbsim.simulation import Simulation
 from gym_jsbsim.visualiser import FigureVisualiser, FlightGearVisualiser
 from gym_jsbsim.aircraft import Aircraft, cessna172P
 from typing import Type, Tuple, Dict
-import boto3
 
 
 
@@ -86,6 +85,8 @@ class JsbSimEnv(gym.Env):
         self.action = self.action + action_delta
         # constrain action to range
         self.action = np.clip(self.action, self.action_space.low, self.action_space.high)
+        # Add bias to engine
+        self.action[-1] = np.clip(self.action[-1] + 0.5, 0, 1)
         if not (action.shape == self.action_space.shape):
             raise ValueError('mismatch between action and action space size')
 

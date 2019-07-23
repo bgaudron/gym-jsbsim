@@ -136,8 +136,9 @@ class HeadingControlTask(BaseFlightTask):
         alt_r = math.exp(-(last_state.position_delta_altitude_to_target_ft/100)**2)
         roll_r = math.exp(-(last_state.attitude_roll_rad/0.087)**2)
         pitch_r = math.exp(-(last_state.attitude_pitch_rad/0.087)**2)
+        speed_r = math.exp(-((sim.jsbsim['velocities/mach'] - 0.8)/0.1)**2)
         # Gaussian Prod
-        return (heading_r * alt_r * roll_r * pitch_r)
+        return (heading_r * alt_r * roll_r * pitch_r * speed_r)
 
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get   
