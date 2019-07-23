@@ -39,6 +39,7 @@ altitude_rate_fps = Property('velocities/h-dot-fps', 'rate of altitude change [f
 phi_dot = BoundedProperty('velocities/phidot-rad_sec', 'rad/s', -2 * math.pi, 2 * math.pi)
 theta_dot = BoundedProperty('velocities/thetadot-rad_sec', 'rad/s', -2 * math.pi, 2 * math.pi)
 v_air = BoundedProperty('velocities/vc-fps', 'airspeed in knots', 0, 4400)
+mach = Property('velocities/mach', 'Mach number')
 
 # Acceleration
 p_dot = BoundedProperty('accelerations/pdot-rad_sec2', 'rad/s²',  -(8/180) * math.pi, (8/180) * math.pi)
