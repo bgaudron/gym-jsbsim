@@ -66,7 +66,7 @@ gear = BoundedProperty('gear/gear-pos-norm', 'landing gear position, normalised'
 # engines
 engine_running = Property('propulsion/engine/set-running', 'engine running (0/1 bool)')
 all_engine_running = Property('propulsion/set-running', 'set engine running (-1 for all engines)')
-engine_thrust_lbs = Property('propulsion/engine/thrust-lbs', 'engine thrust [lb]')
+engine_thrust_lbs = BoundedProperty('propulsion/engine/thrust-lbs', 'engine thrust [lb]', 0, 200000)
 
 # controls command
 aileron_cmd = BoundedProperty('fcs/aileron-cmd-norm', 'aileron commanded position, normalised', -1., 1.)
