@@ -88,7 +88,7 @@ setup(
     packages=[x for x in find_packages()],
     ext_modules=[CMakeExtension(name='jsbsim', sourcedir='jsbsim')],
     cmdclass={'build_ext': CustomBuild},
-    install_requires=['gym>=0.12.5'],
+    install_requires=['cython>=0.25', 'gym>=0.12.5'],
     # key is the package name
     package_data = { 'gym_jsbsim': ['data/aircraft/A320/*.xml', 'data/engine/*.xml', 'data/systems/*.xml'] }
 )
