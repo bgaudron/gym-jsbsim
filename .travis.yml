@@ -20,5 +20,4 @@ matrix:
           update: true
 
 install:
-  - pip install -q cython
   - pip3 install .
