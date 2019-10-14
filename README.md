@@ -1,4 +1,4 @@
-**Status:** Development (expect frequent changes :-) )
+[![Build Status](https://travis-ci.org/galleon/gym-jsbsim.svg?branch=new_gal)](https://travis-ci.org/galleon/gym-jsbsim)
 
 
 NEWS
